@@ -517,11 +517,6 @@ plugins:
         url: /assets/music/14.mp3 # audio url
         cover: # audio cover url
         # lrc: /assets/music/14.lrc # audio cover lrc
-      - name: Under My Breath# audio name
-        artist: 铁痕电台-MSR # audio artist
-        url: /assets/music/7.mp3 # audio url
-        cover: # audio cover url
-        # lrc: /assets/music/7.lrc # audio cover lrc
         # .... you can add more audios here
   # Mermaid JS. Requires hexo-filter-mermaid-diagrams (npm i hexo-filter-mermaid-diagrams). See https://mermaid.js.org/
   mermaid:
