@@ -209,9 +209,9 @@ navbar:
     pages: 1000px #other pages
   # Navbar links
   links:
-    首页: 
-      path: / 
-      icon: # can be empty
+    # 首页: 
+    #   path: / 
+    #   icon: # can be empty
     # 新闻: 
     #   path: /newsletter 
     #   icon: # can be empty
@@ -221,12 +221,12 @@ navbar:
     关于: 
       icon: 
       submenus:
-        Me: /source/_posts/about.md
+        Me: /2026/06/30/about/ 
         计算机学部: https://jsj.shanhe.co
     #     Blog: https://ohevan.com
     #     Friends: /friends
     山河大学官网:
-        path: https://shanhe.co/
+        path: https://www.shanhe.co/
     # Links: 
     #   icon: fa-regular fa-link
     #   submenus:
