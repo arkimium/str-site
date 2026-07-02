@@ -218,11 +218,11 @@ navbar:
     distroweek#:
         submenus:
           敬请期待: /
-          icon: 
+          # icon: 
     播客:
         submenus:
           敬请期待: /
-          icon: 
+          # icon: 
     # Status: 
     #   path: https://status.ohevan.com/
     #   icon: fa-regular fa-chart-bar
