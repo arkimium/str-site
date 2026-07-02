@@ -471,57 +471,57 @@ plugins:
         artist: 铁痕电台-MSR # audio artist
         url: /assets/music/8.mp3 # audio url
         cover: # audio cover url
-        lrc: # audio cover lrc
+        # lrc: # audio cover lrc
       - name: 烘炉# audio name
         artist: 铁痕电台-MSR # audio artist
         url: /assets/music/6.mp3 # audio url
         cover: # audio cover url
-        lrc: # audio cover lrc
+        # lrc: # audio cover lrc
       - name: fake face dance music # audio name
         artist: 音田雅则 # audio artist
         url: /assets/music/12.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/12.lrc # audio cover lrc
+        # lrc: /assets/music/12.lrc # audio cover lrc
       - name: Don't Miss It # audio name
         artist: 塞壬唱片-MSR # audio artist
         url: /assets/music/3.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/3.lrc # audio cover lrc
+        # lrc: /assets/music/3.lrc # audio cover lrc
       - name: Your Star # audio name
         artist: 塞壬唱片-MSR # audio artist
         url: /assets/music/17.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/17.lrc # audio cover lrc
+        # lrc: /assets/music/17.lrc # audio cover lrc
       - name: Speed of Light # audio name
         artist: 塞壬唱片-MSR # audio artist
         url: /assets/music/1.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/1.lrc # audio cover lrc
+        # lrc: /assets/music/1.lrc # audio cover lrc
       - name: Everything's Alright # audio name
         artist: 塞壬唱片-MSR # audio artist
         url: /assets/music/2.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/2.lrc # audio cover lrc
+        # lrc: /assets/music/2.lrc # audio cover lrc
       - name: Magical Lights # audio name
         artist: 异环10AM, ELLY.K # audio artist
         url: /assets/music/15.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/15.lrc # audio cover lrc
+        # lrc: /assets/music/15.lrc # audio cover lrc
       - name: 100% Crimson Solver # audio name
         artist: 异环10AM, Mood & Feel # audio artist
         url: /assets/music/16.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/16.lrc # audio cover lrc
+        # lrc: /assets/music/16.lrc # audio cover lrc
       - name: 漫游打卡进程66% # audio name
         artist: 异环10AM # audio artist
         url: /assets/music/14.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/14.lrc # audio cover lrc
+        # lrc: /assets/music/14.lrc # audio cover lrc
       - name: Under My Breath# audio name
         artist: 铁痕电台-MSR # audio artist
         url: /assets/music/7.mp3 # audio url
         cover: # audio cover url
-        lrc: /assets/music/7.lrc # audio cover lrc
+        # lrc: /assets/music/7.lrc # audio cover lrc
         # .... you can add more audios here
   # Mermaid JS. Requires hexo-filter-mermaid-diagrams (npm i hexo-filter-mermaid-diagrams). See https://mermaid.js.org/
   mermaid:
