@@ -225,10 +225,10 @@ navbar:
         计算机学部: https://jsj.shanhe.co
     #     Blog: https://ohevan.com
     #     Friends: /friends
+    学籍管理:
+        path: https://user.shanhe.co/
     山河大学官网:
         path: https://www.shanhe.co/
-    学籍管理：
-        path: https://user.shanhe.co/
     # Links: 
     #   icon: fa-regular fa-link
     #   submenus:
