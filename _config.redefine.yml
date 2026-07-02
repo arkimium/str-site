@@ -212,9 +212,17 @@ navbar:
     # 首页: 
     #   path: / 
     #   icon: # can be empty
-    # 新闻: 
-    #   path: /newsletter 
-    #   icon: # can be empty
+    往期新闻: 
+      path: /archives 
+      icon: # can be empty
+    distroweek#:
+        submenus:
+          敬请期待: /
+          icon: 
+    播客:
+        submenus:
+          敬请期待: /
+          icon: 
     # Status: 
     #   path: https://status.ohevan.com/
     #   icon: fa-regular fa-chart-bar
@@ -423,7 +431,7 @@ footer:
   # Site statistics
   statistics: true # show site statistics or not (total articles, total words)
   # Footer message
-  customize: 山河科技新闻社新闻网
+  customize: 山河大学计算机学部主管 山河科技新闻社主办 | 投稿邮箱：net@shanhe.team
   # ICP record number. See https://beian.miit.gov.cn/
   icp:
     enable: enable # Whether to enable
