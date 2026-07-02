@@ -467,12 +467,12 @@ plugins:
     enable: true # Whether to enable
     type: fixed # fixed, mini
     audios:
-      - name: 方兴# audio name
+      - name: 方兴 # audio name
         artist: 铁痕电台-MSR # audio artist
         url: /assets/music/8.mp3 # audio url
         cover: # audio cover url
         # lrc: # audio cover lrc
-      - name: 烘炉# audio name
+      - name: 烘炉 # audio name
         artist: 铁痕电台-MSR # audio artist
         url: /assets/music/6.mp3 # audio url
         cover: # audio cover url
