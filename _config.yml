@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 山河科技评论
+title: 山河科技评论 - 计算机学部 - 山河大学
 subtitle: '立足山河，智观世界'
 description: '24小时科技新闻门户'
 keywords:
@@ -77,6 +77,9 @@ category_map:
   "Podcast": podcast
   "Editor's Comments": editor-comment
   "TechNews Research": tnr
+  "distroweek#": distroweek
+  "Gaming": game
+  "Weekly": weekly
 tag_map:
 
 # Metadata elements
