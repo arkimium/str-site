@@ -227,6 +227,8 @@ navbar:
     #     Friends: /friends
     山河大学官网:
         path: https://www.shanhe.co/
+    学籍管理：
+        path: https://user.shanhe.co/
     # Links: 
     #   icon: fa-regular fa-link
     #   submenus:
