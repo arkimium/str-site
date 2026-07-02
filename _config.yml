@@ -73,6 +73,13 @@ category_map:
   "Linux": Linux
   "China": cn
   "AI Tech": ai-tech
+  "Android": android
+  "Apple": apple
+  "Windows": windows
+  "Hacker": hacker
+  "Cyber Security": cybersec
+  "Hardware": hw
+  "Software": sw
   "Open Source": open-source
   "Podcast": podcast
   "Editor's Comments": editor-comment
@@ -80,6 +87,9 @@ category_map:
   "distroweek#": distroweek
   "Gaming": game
   "Weekly": weekly
+  "TechAbstract": abstract
+  "GitHub": github
+  "AI/LLM": ai-llm
 tag_map:
 
 # Metadata elements
