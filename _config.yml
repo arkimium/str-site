@@ -70,7 +70,7 @@ category_map:
   "news": news
   "Programming Languages": programming-languages
   "International": international
-  "Linux": Linux
+  "Linux": linux
   "China": cn
   "AI Tech": ai-tech
   "Android": android
@@ -90,6 +90,11 @@ category_map:
   "TechAbstract": abstract
   "GitHub": github
   "AI/LLM": ai-llm
+  "GNU": gnu
+  "Flathub": flathub
+  "Snapcraft": snap
+  "Desktop Environment": de
+  "Window Manager": wm
 tag_map:
 
 # Metadata elements

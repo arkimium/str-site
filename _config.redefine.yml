@@ -492,6 +492,11 @@ plugins:
         url: /assets/music/17.mp3 # audio url
         cover: # audio cover url
         # lrc: /assets/music/17.lrc # audio cover lrc
+      - name: Undertopia # audio name
+        artist: 塞壬唱片-MSR # audio artist
+        url: /assets/music/20.mp3 # audio url
+        cover: # audio cover url
+        # lrc: /assets/music/17.lrc # audio cover lrc
       - name: Speed of Light # audio name
         artist: 塞壬唱片-MSR # audio artist
         url: /assets/music/1.mp3 # audio url
@@ -517,6 +522,26 @@ plugins:
         url: /assets/music/14.mp3 # audio url
         cover: # audio cover url
         # lrc: /assets/music/14.lrc # audio cover lrc
+      - name: 预言 Prophecy # audio name
+        artist: 三Z-STUDIO, HoYo-MiX # audio artist
+        url: /assets/music/22.flac # audio url
+        cover: # audio cover url
+        # lrc: /assets/music/14.lrc # audio cover lrc
+      - name: WE ARE EMPIRE # audio name
+        artist: 铁痕电台-MSR
+        url: /assets/music/22.mp3 # audio url
+        cover: # audio cover url
+        # lrc: /assets/music/17.lrc # audio cover lrc
+      - name: 宜 # audio name
+        artist: 铁痕电台-MSR, 普阿山, HeartStrings # audio artist
+        url: /assets/music/21.mp3 # audio url
+        cover: # audio cover url
+        # lrc: /assets/music/17.lrc # audio cover lrc
+      - name: Луги # audio name
+        artist: SadSvit, Do Sliz
+        url: /assets/music/17.mp3 # audio url
+        cover: # audio cover url
+        # lrc: /assets/music/17.lrc # audio cover lrc
         # .... you can add more audios here
   # Mermaid JS. Requires hexo-filter-mermaid-diagrams (npm i hexo-filter-mermaid-diagrams). See https://mermaid.js.org/
   mermaid:
