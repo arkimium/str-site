@@ -539,7 +539,7 @@ plugins:
         # lrc: /assets/music/17.lrc # audio cover lrc
       - name: Луги # audio name
         artist: SadSvit, Do Sliz
-        url: /assets/music/17.mp3 # audio url
+        url: /assets/music/19.mp3 # audio url
         cover: # audio cover url
         # lrc: /assets/music/17.lrc # audio cover lrc
         # .... you can add more audios here
